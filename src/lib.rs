@@ -1,26 +1,26 @@
 pub mod matchers;
 
 pub trait Matcher<T> {
-    fn match_value(&self, value: &T) -> Result<String, String>;
+    fn match_value(&self, actual: &T) -> Result<String, String>;
 }
 
-pub fn expect<T>(value: T) -> Expectation<T> {
-    Expectation { value: value }
+pub fn expect<T>(actual: T) -> Expectation<T> {
+    Expectation { actual: actual }
 }
 
 pub struct Expectation<T> {
-    value: T,
+    actual: T,
 }
 
 impl<T> Expectation<T> {
     pub fn to<M: Matcher<T>>(&self, matcher: M) {
-        if let Err(positive_failure_message) = matcher.match_value(&self.value) {
+        if let Err(positive_failure_message) = matcher.match_value(&self.actual) {
             panic!(positive_failure_message)
         }
     }
 
     pub fn not_to<M: Matcher<T>>(&self, matcher: M) {
-        if let Ok(negative_failure_message) = matcher.match_value(&self.value) {
+        if let Ok(negative_failure_message) = matcher.match_value(&self.actual) {
             panic!(negative_failure_message)
         }
     }
