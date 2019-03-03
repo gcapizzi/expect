@@ -8,12 +8,12 @@ pub struct EqualMatcher<T> {
     value: T
 }
 
-impl <T: std::cmp::PartialEq> Matcher<T> for EqualMatcher<T> {
-    fn match_value(&self, value: &T) -> Result<(), ()> {
+impl <T: std::cmp::PartialEq + std::fmt::Display> Matcher<T> for EqualMatcher<T> {
+    fn match_value(&self, value: &T) -> Result<String, String> {
         if *value == self.value {
-            Ok(())
+            Ok(format!("expected {} not to equal {}", value, self.value))
         } else {
-            Err(())
+            Err(format!("expected {} to equal {}", value, self.value))
         }
     }
 }
