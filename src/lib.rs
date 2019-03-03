@@ -5,14 +5,14 @@ pub trait Matcher<T> {
 }
 
 pub fn expect<T>(value: T) -> Expectation<T> {
-    Expectation{value: value}
+    Expectation { value: value }
 }
 
 pub struct Expectation<T> {
-    value: T
+    value: T,
 }
 
-impl <T> Expectation<T> {
+impl<T> Expectation<T> {
     pub fn to<M: Matcher<T>>(&self, matcher: M) {
         if let Err(positive_failure_message) = matcher.match_value(&self.value) {
             panic!(positive_failure_message)
@@ -33,23 +33,23 @@ mod tests {
 
     #[test]
     fn expect_to_should_not_panic_if_the_matcher_matches_successfully() {
-        expect(2+2).to(equal(4))
+        expect(2 + 2).to(equal(4))
     }
 
     #[test]
     #[should_panic(expected = "expected 4 to equal 5")]
     fn expect_to_should_panic_if_the_marcher_fails_to_match() {
-        expect(2+2).to(equal(5))
+        expect(2 + 2).to(equal(5))
     }
 
     #[test]
     #[should_panic(expected = "expected 4 not to equal 4")]
     fn expect_not_to_should_panic_if_the_marcher_matches_successfully() {
-        expect(2+2).not_to(equal(4))
+        expect(2 + 2).not_to(equal(4))
     }
 
     #[test]
     fn expect_not_to_should_not_panic_if_the_matcher_fails_to_match() {
-        expect(2+2).not_to(equal(5))
+        expect(2 + 2).not_to(equal(5))
     }
 }
