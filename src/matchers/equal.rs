@@ -18,3 +18,18 @@ impl <T: std::cmp::PartialEq + std::fmt::Display> Matcher<T> for EqualMatcher<T>
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::Matcher;
+    use super::EqualMatcher;
+
+    #[test]
+    fn match_value_should_succeed_if_actual_equals_expected() {
+        assert_eq!(EqualMatcher{value: 42}.match_value(&42), Ok(String::from("expected 42 not to equal 42")))
+    }
+
+    #[test]
+    fn match_value_should_fail_if_actual_does_not_equal_expected() {
+        assert_eq!(EqualMatcher{value: 42}.match_value(&43), Err(String::from("expected 43 to equal 42")))
+    }
+}
