@@ -1,7 +1,13 @@
 pub mod matchers;
 
+#[derive(PartialEq, Debug)]
+pub enum Match {
+    Matched(String),
+    NotMatched(String),
+}
+
 pub trait Matcher<T> {
-    fn match_value(&self, actual: &T) -> Result<String, String>;
+    fn match_value(&self, actual: &T) -> Match;
 }
 
 pub fn expect<T>(actual: T) -> Expectation<T> {
@@ -14,13 +20,13 @@ pub struct Expectation<T> {
 
 impl<T> Expectation<T> {
     pub fn to<M: Matcher<T>>(&self, matcher: M) {
-        if let Err(positive_failure_message) = matcher.match_value(&self.actual) {
+        if let Match::NotMatched(positive_failure_message) = matcher.match_value(&self.actual) {
             panic!(positive_failure_message)
         }
     }
 
     pub fn not_to<M: Matcher<T>>(&self, matcher: M) {
-        if let Ok(negative_failure_message) = matcher.match_value(&self.actual) {
+        if let Match::Matched(negative_failure_message) = matcher.match_value(&self.actual) {
             panic!(negative_failure_message)
         }
     }
