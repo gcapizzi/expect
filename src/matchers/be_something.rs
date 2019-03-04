@@ -1,13 +1,13 @@
 use crate::Match;
 use crate::Matcher;
 
-pub fn be_some() -> SomeMatcher {
-    SomeMatcher {}
+pub fn be_something() -> SomethingMatcher {
+    SomethingMatcher {}
 }
 
-pub struct SomeMatcher {}
+pub struct SomethingMatcher {}
 
-impl<T: std::fmt::Debug> Matcher<Option<T>> for SomeMatcher {
+impl<T: std::fmt::Debug> Matcher<Option<T>> for SomethingMatcher {
     fn match_value(&self, actual: &Option<T>) -> Match {
         if actual.is_some() {
             Match::Matched(format!("expected {:?} not to be a Some", actual))
@@ -19,8 +19,8 @@ impl<T: std::fmt::Debug> Matcher<Option<T>> for SomeMatcher {
 
 #[cfg(test)]
 mod tests {
-    use super::be_some;
-    use super::SomeMatcher;
+    use super::be_something;
+    use super::SomethingMatcher;
     use crate::expect;
     use crate::Match;
     use crate::Matcher;
@@ -29,7 +29,7 @@ mod tests {
     fn should_match_if_actual_is_some() {
         let actual = Some("foo");
         assert_eq!(
-            SomeMatcher {}.match_value(&actual),
+            SomethingMatcher {}.match_value(&actual),
             Match::Matched(String::from("expected Some(\"foo\") not to be a Some"))
         )
     }
@@ -38,13 +38,13 @@ mod tests {
     fn should_not_match_if_actual_is_none() {
         let actual: Option<String> = None;
         assert_eq!(
-            SomeMatcher {}.match_value(&actual),
+            SomethingMatcher {}.match_value(&actual),
             Match::NotMatched(String::from("expected None to be a Some"))
         )
     }
 
     #[test]
-    fn be_some_should_contruct_a_some_matcher() {
-        expect(&Some("thing")).to(be_some())
+    fn be_something_should_contruct_a_some_matcher() {
+        expect(&Some("thing")).to(be_something())
     }
 }
