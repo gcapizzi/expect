@@ -24,7 +24,9 @@ impl<T: std::cmp::PartialEq + std::fmt::Display> Matcher<T> for EqualMatcher<T> 
 
 #[cfg(test)]
 mod tests {
+    use super::equal;
     use super::EqualMatcher;
+    use crate::expect;
     use crate::Match;
     use crate::Matcher;
 
@@ -42,5 +44,10 @@ mod tests {
             EqualMatcher { expected: 42 }.match_value(&43),
             Match::NotMatched(String::from("expected 43 to equal 42"))
         )
+    }
+
+    #[test]
+    fn equal_should_construct_an_equal_matcher() {
+        expect(&42).to(equal(42))
     }
 }
