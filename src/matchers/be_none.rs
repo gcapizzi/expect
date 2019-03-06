@@ -7,9 +7,7 @@ pub fn be_none() -> NoneMatcher {
 
 pub struct NoneMatcher {}
 
-impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<Option<T>>
-    for NoneMatcher
-{
+impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<Option<T>> for NoneMatcher {
     fn match_value(&self, actual: &Option<T>) -> Match {
         match actual {
             None => Match::Matched(format!("expected {:?} not to be None", actual)),

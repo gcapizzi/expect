@@ -14,12 +14,23 @@ impl<T: std::cmp::PartialEq + std::fmt::Debug, E: std::fmt::Debug> Matcher<Resul
 {
     fn match_value(&self, actual: &Result<T, E>) -> Match {
         match actual {
-            Ok(actual_value) => if actual_value == &self.expected {
-                Match::Matched(format!("expected Ok({:?}) not to be Ok({:?})", actual_value, self.expected))
-            } else {
-                Match::NotMatched(format!("expected Ok({:?}) to be Ok({:?})", actual_value, self.expected))
-            },
-            Err(actual_value) => Match::NotMatched(format!("expected Err({:?}) to be Ok({:?})", actual_value, self.expected)),
+            Ok(actual_value) => {
+                if actual_value == &self.expected {
+                    Match::Matched(format!(
+                        "expected Ok({:?}) not to be Ok({:?})",
+                        actual_value, self.expected
+                    ))
+                } else {
+                    Match::NotMatched(format!(
+                        "expected Ok({:?}) to be Ok({:?})",
+                        actual_value, self.expected
+                    ))
+                }
+            }
+            Err(actual_value) => Match::NotMatched(format!(
+                "expected Err({:?}) to be Ok({:?})",
+                actual_value, self.expected
+            )),
         }
     }
 }

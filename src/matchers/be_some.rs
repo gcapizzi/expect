@@ -9,16 +9,22 @@ pub struct SomeMatcher<T> {
     expected: T,
 }
 
-impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<Option<T>>
-    for SomeMatcher<T>
-{
+impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<Option<T>> for SomeMatcher<T> {
     fn match_value(&self, actual: &Option<T>) -> Match {
         match actual {
-            Some(actual_value) => if actual_value == &self.expected {
-                Match::Matched(format!("expected Some({:?}) not to be Some({:?})", actual_value, self.expected))
-            } else {
-                Match::NotMatched(format!("expected Some({:?}) to be Some({:?})", actual_value, self.expected))
-            },
+            Some(actual_value) => {
+                if actual_value == &self.expected {
+                    Match::Matched(format!(
+                        "expected Some({:?}) not to be Some({:?})",
+                        actual_value, self.expected
+                    ))
+                } else {
+                    Match::NotMatched(format!(
+                        "expected Some({:?}) to be Some({:?})",
+                        actual_value, self.expected
+                    ))
+                }
+            }
             None => Match::NotMatched(format!("expected None to be Some({:?})", self.expected)),
         }
     }
