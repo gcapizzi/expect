@@ -9,10 +9,9 @@ pub struct SomethingMatcher {}
 
 impl<T: std::fmt::Debug> Matcher<Option<T>> for SomethingMatcher {
     fn match_value(&self, actual: &Option<T>) -> Match {
-        if actual.is_some() {
-            Match::Matched(format!("expected {:?} not to be a Some", actual))
-        } else {
-            Match::NotMatched(String::from("expected None to be a Some"))
+        match actual {
+            Some(_) => Match::Matched(format!("expected {:?} not to be a Some", actual)),
+            _ => Match::NotMatched(String::from("expected None to be a Some")),
         }
     }
 }
