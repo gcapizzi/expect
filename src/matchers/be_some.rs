@@ -11,7 +11,7 @@ impl<T: std::fmt::Debug> Matcher<Option<T>> for SomeMatcher {
     fn match_value(&self, actual: &Option<T>) -> Match {
         match actual {
             Some(_) => Match::Matched(format!("expected {:?} not to be a Some", actual)),
-            _ => Match::NotMatched(String::from("expected None to be a Some")),
+            _ => Match::NotMatched(format!("expected {:?} to be a Some", actual)),
         }
     }
 }
