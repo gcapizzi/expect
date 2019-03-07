@@ -9,15 +9,18 @@ pub struct EqualMatcher<T> {
     expected: T,
 }
 
-impl<T: std::cmp::PartialEq + std::fmt::Display> Matcher<T> for EqualMatcher<T> {
+impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<T> for EqualMatcher<T> {
     fn match_value(&self, actual: &T) -> Match {
-        if *actual == self.expected {
+        if actual == &self.expected {
             Match::Matched(format!(
-                "expected {} not to equal {}",
+                "expected {:?} not to equal {:?}",
                 actual, self.expected
             ))
         } else {
-            Match::NotMatched(format!("expected {} to equal {}", actual, self.expected))
+            Match::NotMatched(format!(
+                "expected {:?} to equal {:?}",
+                actual, self.expected
+            ))
         }
     }
 }
@@ -33,21 +36,21 @@ mod tests {
     #[test]
     fn should_match_if_actual_equals_expected() {
         assert_eq!(
-            EqualMatcher { expected: 42 }.match_value(&42),
-            Match::Matched(String::from("expected 42 not to equal 42"))
+            EqualMatcher { expected: "foo" }.match_value(&"foo"),
+            Match::Matched(String::from("expected \"foo\" not to equal \"foo\""))
         )
     }
 
     #[test]
     fn should_not_match_if_actual_does_not_equal_expected() {
         assert_eq!(
-            EqualMatcher { expected: 42 }.match_value(&43),
-            Match::NotMatched(String::from("expected 43 to equal 42"))
+            EqualMatcher { expected: "foo" }.match_value(&"bar"),
+            Match::NotMatched(String::from("expected \"bar\" to equal \"foo\""))
         )
     }
 
     #[test]
     fn equal_should_construct_an_equal_matcher() {
-        expect(&42).to(equal(42))
+        expect(&"foo").to(equal("foo"))
     }
 }
