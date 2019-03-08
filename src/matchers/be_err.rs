@@ -1,4 +1,3 @@
-use crate::Match;
 use crate::Matcher;
 
 pub fn be_err() -> ErrMatcher {
@@ -8,11 +7,16 @@ pub fn be_err() -> ErrMatcher {
 pub struct ErrMatcher {}
 
 impl<T: std::fmt::Debug, E: std::fmt::Debug> Matcher<Result<T, E>> for ErrMatcher {
-    fn match_value(&self, actual: &Result<T, E>) -> Match {
-        match actual {
-            Err(_) => Match::Matched(format!("expected {:?} not to be an Err", actual)),
-            _ => Match::NotMatched(format!("expected {:?} to be an Err", actual)),
-        }
+    fn match_value(&self, actual: &Result<T, E>) -> bool {
+        actual.is_err()
+    }
+
+    fn failure_message(&self, actual: &Result<T, E>) -> String {
+        format!("expected {:?} to be an Err", actual)
+    }
+
+    fn negated_failure_message(&self, actual: &Result<T, E>) -> String {
+        format!("expected {:?} not to be an Err", actual)
     }
 }
 
@@ -21,25 +25,31 @@ mod tests {
     use super::be_err;
     use super::ErrMatcher;
     use crate::expect;
-    use crate::Match;
     use crate::Matcher;
 
     #[test]
     fn should_match_if_actual_is_an_err() {
         let actual: Result<u32, String> = Err(String::from("boo"));
-        assert_eq!(
-            ErrMatcher {}.match_value(&actual),
-            Match::Matched(String::from("expected Err(\"boo\") not to be an Err"))
-        )
+        assert!(ErrMatcher {}.match_value(&actual))
     }
 
     #[test]
     fn should_not_match_if_actual_is_ok() {
         let actual: Result<u32, String> = Ok(42);
+        assert!(!ErrMatcher {}.match_value(&actual))
+    }
+
+    #[test]
+    fn failure_messages() {
+        let actual: Result<u32, String> = Err(String::from("boo"));
         assert_eq!(
-            ErrMatcher {}.match_value(&actual),
-            Match::NotMatched(String::from("expected Ok(42) to be an Err"))
-        )
+            ErrMatcher {}.failure_message(&actual),
+            String::from("expected Err(\"boo\") to be an Err")
+        );
+        assert_eq!(
+            ErrMatcher {}.negated_failure_message(&actual),
+            String::from("expected Err(\"boo\") not to be an Err")
+        );
     }
 
     #[test]

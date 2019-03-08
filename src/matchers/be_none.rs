@@ -1,4 +1,3 @@
-use crate::Match;
 use crate::Matcher;
 
 pub fn be_none() -> NoneMatcher {
@@ -8,11 +7,16 @@ pub fn be_none() -> NoneMatcher {
 pub struct NoneMatcher {}
 
 impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<Option<T>> for NoneMatcher {
-    fn match_value(&self, actual: &Option<T>) -> Match {
-        match actual {
-            None => Match::Matched(format!("expected {:?} not to be None", actual)),
-            _ => Match::NotMatched(format!("expected {:?} to be None", actual)),
-        }
+    fn match_value(&self, actual: &Option<T>) -> bool {
+        actual.is_none()
+    }
+
+    fn failure_message(&self, actual: &Option<T>) -> String {
+        format!("expected {:?} to be None", actual)
+    }
+
+    fn negated_failure_message(&self, actual: &Option<T>) -> String {
+        format!("expected {:?} not to be None", actual)
     }
 }
 
@@ -21,25 +25,31 @@ mod tests {
     use super::be_none;
     use super::NoneMatcher;
     use crate::expect;
-    use crate::Match;
     use crate::Matcher;
 
     #[test]
     fn should_match_if_actual_is_none() {
         let actual: Option<u32> = None;
-        assert_eq!(
-            NoneMatcher {}.match_value(&actual),
-            Match::Matched(String::from("expected None not to be None"))
-        )
+        assert!(NoneMatcher {}.match_value(&actual))
     }
 
     #[test]
     fn should_not_match_if_actual_is_some() {
         let actual = Some("thing");
+        assert!(!NoneMatcher {}.match_value(&actual))
+    }
+
+    #[test]
+    fn failure_messages() {
+        let actual: Option<u32> = None;
         assert_eq!(
-            NoneMatcher {}.match_value(&actual),
-            Match::NotMatched(String::from("expected Some(\"thing\") to be None"))
-        )
+            NoneMatcher {}.failure_message(&actual),
+            String::from("expected None to be None")
+        );
+        assert_eq!(
+            NoneMatcher {}.negated_failure_message(&actual),
+            String::from("expected None not to be None")
+        );
     }
 
     #[test]

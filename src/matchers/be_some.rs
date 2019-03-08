@@ -1,4 +1,3 @@
-use crate::Match;
 use crate::Matcher;
 
 pub fn be_some() -> SomeMatcher {
@@ -8,11 +7,16 @@ pub fn be_some() -> SomeMatcher {
 pub struct SomeMatcher {}
 
 impl<T: std::fmt::Debug> Matcher<Option<T>> for SomeMatcher {
-    fn match_value(&self, actual: &Option<T>) -> Match {
-        match actual {
-            Some(_) => Match::Matched(format!("expected {:?} not to be a Some", actual)),
-            _ => Match::NotMatched(format!("expected {:?} to be a Some", actual)),
-        }
+    fn match_value(&self, actual: &Option<T>) -> bool {
+        actual.is_some()
+    }
+
+    fn failure_message(&self, actual: &Option<T>) -> String {
+        format!("expected {:?} to be a Some", actual)
+    }
+
+    fn negated_failure_message(&self, actual: &Option<T>) -> String {
+        format!("expected {:?} not to be a Some", actual)
     }
 }
 
@@ -21,25 +25,31 @@ mod tests {
     use super::be_some;
     use super::SomeMatcher;
     use crate::expect;
-    use crate::Match;
     use crate::Matcher;
 
     #[test]
     fn should_match_if_actual_is_some() {
         let actual = Some("foo");
-        assert_eq!(
-            SomeMatcher {}.match_value(&actual),
-            Match::Matched(String::from("expected Some(\"foo\") not to be a Some"))
-        )
+        assert!(SomeMatcher {}.match_value(&actual))
     }
 
     #[test]
     fn should_not_match_if_actual_is_none() {
         let actual: Option<String> = None;
+        assert!(!SomeMatcher {}.match_value(&actual))
+    }
+
+    #[test]
+    fn failure_messages() {
+        let actual = Some("foo");
         assert_eq!(
-            SomeMatcher {}.match_value(&actual),
-            Match::NotMatched(String::from("expected None to be a Some"))
-        )
+            SomeMatcher {}.failure_message(&actual),
+            String::from("expected Some(\"foo\") to be a Some")
+        );
+        assert_eq!(
+            SomeMatcher {}.negated_failure_message(&actual),
+            String::from("expected Some(\"foo\") not to be a Some")
+        );
     }
 
     #[test]

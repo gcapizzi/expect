@@ -1,4 +1,3 @@
-use crate::Match;
 use crate::Matcher;
 
 pub fn equal<T>(expected: T) -> EqualMatcher<T> {
@@ -10,18 +9,16 @@ pub struct EqualMatcher<T> {
 }
 
 impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<T> for EqualMatcher<T> {
-    fn match_value(&self, actual: &T) -> Match {
-        if actual == &self.expected {
-            Match::Matched(format!(
-                "expected {:?} not to equal {:?}",
-                actual, self.expected
-            ))
-        } else {
-            Match::NotMatched(format!(
-                "expected {:?} to equal {:?}",
-                actual, self.expected
-            ))
-        }
+    fn match_value(&self, actual: &T) -> bool {
+        actual == &self.expected
+    }
+
+    fn failure_message(&self, actual: &T) -> String {
+        format!("expected {:?} to equal {:?}", actual, self.expected)
+    }
+
+    fn negated_failure_message(&self, actual: &T) -> String {
+        format!("expected {:?} not to equal {:?}", actual, self.expected)
     }
 }
 
@@ -30,23 +27,28 @@ mod tests {
     use super::equal;
     use super::EqualMatcher;
     use crate::expect;
-    use crate::Match;
     use crate::Matcher;
 
     #[test]
     fn should_match_if_actual_equals_expected() {
-        assert_eq!(
-            EqualMatcher { expected: "foo" }.match_value(&"foo"),
-            Match::Matched(String::from("expected \"foo\" not to equal \"foo\""))
-        )
+        assert!(EqualMatcher { expected: "foo" }.match_value(&"foo"))
     }
 
     #[test]
     fn should_not_match_if_actual_does_not_equal_expected() {
+        assert!(!EqualMatcher { expected: "foo" }.match_value(&"bar"))
+    }
+
+    #[test]
+    fn failure_messages() {
         assert_eq!(
-            EqualMatcher { expected: "foo" }.match_value(&"bar"),
-            Match::NotMatched(String::from("expected \"bar\" to equal \"foo\""))
-        )
+            EqualMatcher { expected: "foo" }.failure_message(&"foo"),
+            String::from("expected \"foo\" to equal \"foo\"")
+        );
+        assert_eq!(
+            EqualMatcher { expected: "foo" }.negated_failure_message(&"foo"),
+            String::from("expected \"foo\" not to equal \"foo\"")
+        );
     }
 
     #[test]
