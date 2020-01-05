@@ -29,14 +29,12 @@ mod tests {
 
     #[test]
     fn should_match_if_actual_is_none() {
-        let actual: Option<u32> = None;
-        assert!(NoneMatcher {}.match_value(&actual))
+        assert!(NoneMatcher {}.match_value(&None::<&str>))
     }
 
     #[test]
     fn should_not_match_if_actual_is_some() {
-        let actual = Some("thing");
-        assert!(!NoneMatcher {}.match_value(&actual))
+        assert!(!NoneMatcher {}.match_value(&Some("thing")))
     }
 
     #[test]
@@ -46,14 +44,13 @@ mod tests {
             String::from("\tExpected:\n\t\tSome(\"foo\")\n\tto be None")
         );
         assert_eq!(
-            NoneMatcher {}.negated_failure_message(&None::<Option<u32>>),
+            NoneMatcher {}.negated_failure_message(&None::<&str>),
             String::from("\tExpected:\n\t\tNone\n\tnot to be None")
         );
     }
 
     #[test]
     fn be_none_should_contruct_a_none_matcher() {
-        let actual: Option<u32> = None;
-        expect(&actual).to(be_none())
+        expect(&None::<&str>).to(be_none())
     }
 }

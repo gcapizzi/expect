@@ -29,14 +29,12 @@ mod tests {
 
     #[test]
     fn should_match_if_actual_is_ok() {
-        let actual: Result<u32, String> = Ok(42);
-        assert!(OkMatcher {}.match_value(&actual))
+        assert!(OkMatcher {}.match_value(&Ok::<u32, &str>(42)))
     }
 
     #[test]
     fn should_not_match_if_actual_is_err() {
-        let actual: Result<u32, String> = Err(String::from("boo"));
-        assert!(!OkMatcher {}.match_value(&actual))
+        assert!(!OkMatcher {}.match_value(&Err::<u32, &str>("boo")))
     }
 
     #[test]
@@ -53,7 +51,6 @@ mod tests {
 
     #[test]
     fn be_some_should_contruct_a_some_matcher() {
-        let actual: Result<u32, String> = Ok(42);
-        expect(&actual).to(be_ok())
+        expect(&Ok::<u32, &str>(42)).to(be_ok())
     }
 }

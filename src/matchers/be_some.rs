@@ -29,20 +29,18 @@ mod tests {
 
     #[test]
     fn should_match_if_actual_is_some() {
-        let actual = Some("foo");
-        assert!(SomeMatcher {}.match_value(&actual))
+        assert!(SomeMatcher {}.match_value(&Some("foo")))
     }
 
     #[test]
     fn should_not_match_if_actual_is_none() {
-        let actual: Option<String> = None;
-        assert!(!SomeMatcher {}.match_value(&actual))
+        assert!(!SomeMatcher {}.match_value(&None::<u32>))
     }
 
     #[test]
     fn failure_messages() {
         assert_eq!(
-            SomeMatcher {}.failure_message(&None::<Option<String>>),
+            SomeMatcher {}.failure_message(&None::<&str>),
             String::from("\tExpected:\n\t\tNone\n\tto be a Some")
         );
         assert_eq!(
