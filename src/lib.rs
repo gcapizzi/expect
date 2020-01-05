@@ -58,11 +58,4 @@ mod tests {
     fn expect_not_to_should_not_panic_if_the_matcher_fails_to_match() {
         expect(&(2 + 2)).not_to(equal(5))
     }
-
-    #[test]
-    fn it_should_not_take_ownership_of_the_actual_value() {
-        let s = String::from("hello");
-        expect(&s).to(equal(String::from("hello")));
-        expect(&s).not_to(equal(String::from("bye")));
-    }
 }
