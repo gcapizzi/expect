@@ -10,7 +10,7 @@ pub fn expect<'a, T>(actual: &'a T) -> Expectation<'a, T> {
     Expectation { actual: actual }
 }
 
-pub struct Expectation<'a, T: 'a> {
+pub struct Expectation<'a, T> {
     actual: &'a T,
 }
 
