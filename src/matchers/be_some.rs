@@ -12,11 +12,11 @@ impl<T: std::fmt::Debug> Matcher<Option<T>> for SomeMatcher {
     }
 
     fn failure_message(&self, actual: &Option<T>) -> String {
-        format!("expected {:?} to be a Some", actual)
+        format!("\tExpected:\n\t\t{:?}\n\tto be a Some", actual)
     }
 
     fn negated_failure_message(&self, actual: &Option<T>) -> String {
-        format!("expected {:?} not to be a Some", actual)
+        format!("\tExpected:\n\t\t{:?}\n\tnot to be a Some", actual)
     }
 }
 
@@ -41,14 +41,13 @@ mod tests {
 
     #[test]
     fn failure_messages() {
-        let actual = Some("foo");
         assert_eq!(
-            SomeMatcher {}.failure_message(&actual),
-            String::from("expected Some(\"foo\") to be a Some")
+            SomeMatcher {}.failure_message(&None::<Option<String>>),
+            String::from("\tExpected:\n\t\tNone\n\tto be a Some")
         );
         assert_eq!(
-            SomeMatcher {}.negated_failure_message(&actual),
-            String::from("expected Some(\"foo\") not to be a Some")
+            SomeMatcher {}.negated_failure_message(&Some("foo")),
+            String::from("\tExpected:\n\t\tSome(\"foo\")\n\tnot to be a Some")
         );
     }
 

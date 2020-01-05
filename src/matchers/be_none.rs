@@ -12,11 +12,11 @@ impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<Option<T>> for NoneMatche
     }
 
     fn failure_message(&self, actual: &Option<T>) -> String {
-        format!("expected {:?} to be None", actual)
+        format!("\tExpected:\n\t\t{:?}\n\tto be None", actual)
     }
 
     fn negated_failure_message(&self, actual: &Option<T>) -> String {
-        format!("expected {:?} not to be None", actual)
+        format!("\tExpected:\n\t\t{:?}\n\tnot to be None", actual)
     }
 }
 
@@ -41,14 +41,13 @@ mod tests {
 
     #[test]
     fn failure_messages() {
-        let actual: Option<u32> = None;
         assert_eq!(
-            NoneMatcher {}.failure_message(&actual),
-            String::from("expected None to be None")
+            NoneMatcher {}.failure_message(&Some("foo")),
+            String::from("\tExpected:\n\t\tSome(\"foo\")\n\tto be None")
         );
         assert_eq!(
-            NoneMatcher {}.negated_failure_message(&actual),
-            String::from("expected None not to be None")
+            NoneMatcher {}.negated_failure_message(&None::<Option<u32>>),
+            String::from("\tExpected:\n\t\tNone\n\tnot to be None")
         );
     }
 

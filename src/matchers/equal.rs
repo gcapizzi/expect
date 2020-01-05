@@ -14,11 +14,11 @@ impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<T> for EqualMatcher<T> {
     }
 
     fn failure_message(&self, actual: &T) -> String {
-        format!("expected {:?} to equal {:?}", actual, self.expected)
+        format!("\tExpected:\n\t\t{:?}\n\tto equal:\n\t\t{:?}", self.expected, actual)
     }
 
     fn negated_failure_message(&self, actual: &T) -> String {
-        format!("expected {:?} not to equal {:?}", actual, self.expected)
+        format!("\tExpected:\n\t\t{:?}\n\tnot to equal:\n\t\t{:?}", self.expected, actual)
     }
 }
 
@@ -42,12 +42,12 @@ mod tests {
     #[test]
     fn failure_messages() {
         assert_eq!(
-            EqualMatcher { expected: "foo" }.failure_message(&"foo"),
-            String::from("expected \"foo\" to equal \"foo\"")
+            EqualMatcher { expected: "foo" }.failure_message(&"bar"),
+            String::from("\tExpected:\n\t\t\"foo\"\n\tto equal:\n\t\t\"bar\"")
         );
         assert_eq!(
             EqualMatcher { expected: "foo" }.negated_failure_message(&"foo"),
-            String::from("expected \"foo\" not to equal \"foo\"")
+            String::from("\tExpected:\n\t\t\"foo\"\n\tnot to equal:\n\t\t\"foo\"")
         );
     }
 
