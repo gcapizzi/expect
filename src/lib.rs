@@ -7,7 +7,7 @@ pub trait Matcher<T> {
 }
 
 pub fn expect<'a, T>(actual: &'a T) -> Expectation<'a, T> {
-    Expectation { actual: actual }
+    Expectation { actual }
 }
 
 pub struct Expectation<'a, T> {

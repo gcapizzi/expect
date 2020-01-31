@@ -1,7 +1,7 @@
 use crate::Matcher;
 
 pub fn equal<T>(expected: T) -> EqualMatcher<T> {
-    EqualMatcher { expected: expected }
+    EqualMatcher { expected }
 }
 
 pub struct EqualMatcher<T> {
@@ -14,11 +14,17 @@ impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<T> for EqualMatcher<T> {
     }
 
     fn failure_message(&self, actual: &T) -> String {
-        format!("\tExpected:\n\t\t{:?}\n\tto equal:\n\t\t{:?}", self.expected, actual)
+        format!(
+            "\tExpected:\n\t\t{:?}\n\tto equal:\n\t\t{:?}",
+            self.expected, actual
+        )
     }
 
     fn negated_failure_message(&self, actual: &T) -> String {
-        format!("\tExpected:\n\t\t{:?}\n\tnot to equal:\n\t\t{:?}", self.expected, actual)
+        format!(
+            "\tExpected:\n\t\t{:?}\n\tnot to equal:\n\t\t{:?}",
+            self.expected, actual
+        )
     }
 }
 
