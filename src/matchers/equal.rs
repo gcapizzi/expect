@@ -8,19 +8,19 @@ pub struct EqualMatcher<T> {
     expected: T,
 }
 
-impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<T> for EqualMatcher<T> {
-    fn match_value(&self, actual: &T) -> bool {
+impl<E: std::fmt::Debug, A: PartialEq<E> + std::fmt::Debug> Matcher<A> for EqualMatcher<E> {
+    fn match_value(&self, actual: &A) -> bool {
         actual == &self.expected
     }
 
-    fn failure_message(&self, actual: &T) -> String {
+    fn failure_message(&self, actual: &A) -> String {
         format!(
             "\tExpected:\n\t\t{:?}\n\tto equal:\n\t\t{:?}",
             self.expected, actual
         )
     }
 
-    fn negated_failure_message(&self, actual: &T) -> String {
+    fn negated_failure_message(&self, actual: &A) -> String {
         format!(
             "\tExpected:\n\t\t{:?}\n\tnot to equal:\n\t\t{:?}",
             self.expected, actual
@@ -43,6 +43,11 @@ mod tests {
     #[test]
     fn should_not_match_if_actual_does_not_equal_expected() {
         assert!(!EqualMatcher { expected: "foo" }.match_value(&"bar"))
+    }
+
+    #[test]
+    fn should_allow_comparisons_between_partialeq_values() {
+        assert!(EqualMatcher { expected: "foo" }.match_value(&String::from("foo")));
     }
 
     #[test]
