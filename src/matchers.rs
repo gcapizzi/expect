@@ -9,12 +9,6 @@ pub trait Collection<T> {
     fn contains_element(&self, element: &T) -> bool;
 }
 
-impl<T: std::cmp::PartialEq> Collection<T> for std::vec::Vec<T> {
-    fn contains_element(&self, element: &T) -> bool {
-        self.contains(element)
-    }
-}
-
 macro_rules! array {
     ($($N:expr),+) => {
         $(
@@ -44,14 +38,21 @@ array!(
     250, 251, 252, 253, 254, 255, 256
 );
 
+impl<T: std::cmp::PartialEq> Collection<T> for std::vec::Vec<T> {
+    fn contains_element(&self, element: &T) -> bool {
+        self.contains(element)
+    }
+}
+
+impl<T: std::cmp::PartialEq> Collection<T> for std::collections::VecDeque<T> {
+    fn contains_element(&self, element: &T) -> bool {
+        self.contains(element)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::Collection;
-
-    #[test]
-    fn vecs_are_collections() {
-        assert!(vec![1, 2, 3].contains_element(&2))
-    }
 
     #[test]
     fn arrays_with_up_to_256_elements_are_collections() {
@@ -72,6 +73,21 @@ mod tests {
                 250, 251, 252, 253, 254, 255
             ].contains_element(&255)
         )
+    }
+
+    #[test]
+    fn vecs_are_collections() {
+        assert!(vec![1, 2, 3].contains_element(&2))
+    }
+
+    #[test]
+    fn vecdeques_are_collections() {
+        let mut numbers = std::collections::VecDeque::new();
+        numbers.push_back(1);
+        numbers.push_back(2);
+        numbers.push_back(3);
+
+        assert!(numbers.contains_element(&2))
     }
 }
 
