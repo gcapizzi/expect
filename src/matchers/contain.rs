@@ -1,5 +1,5 @@
-use crate::Matcher;
 use crate::matchers::Collection;
+use crate::Matcher;
 
 pub fn contain<T>(element: T) -> ContainMatcher<T> {
     ContainMatcher { element }
@@ -9,7 +9,9 @@ pub struct ContainMatcher<T> {
     element: T,
 }
 
-impl<T: std::cmp::PartialEq + std::fmt::Debug, V: Collection<T> + std::fmt::Debug> Matcher<V> for ContainMatcher<T> {
+impl<T: std::cmp::PartialEq + std::fmt::Debug, V: Collection<T> + std::fmt::Debug> Matcher<V>
+    for ContainMatcher<T>
+{
     fn match_value(&self, collection: &V) -> bool {
         collection.contains_element(&self.element)
     }
@@ -63,4 +65,3 @@ mod tests {
         expect(&vec!["foo", "bar"]).to(contain("foo"))
     }
 }
-
