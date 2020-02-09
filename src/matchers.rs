@@ -56,6 +56,18 @@ impl<T: std::cmp::PartialEq> Collection<T> for std::collections::LinkedList<T> {
     }
 }
 
+impl<T: std::cmp::Eq + std::hash::Hash> Collection<T> for std::collections::HashSet<T> {
+    fn contains_element(&self, element: &T) -> bool {
+        self.contains(element)
+    }
+}
+
+impl<T: std::cmp::Ord> Collection<T> for std::collections::BTreeSet<T> {
+    fn contains_element(&self, element: &T) -> bool {
+        self.contains(element)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::Collection;
@@ -102,6 +114,26 @@ mod tests {
         numbers.push_back(1);
         numbers.push_back(2);
         numbers.push_back(3);
+
+        assert!(numbers.contains_element(&2))
+    }
+
+    #[test]
+    fn hashsets_are_collections() {
+        let mut numbers = std::collections::HashSet::new();
+        numbers.insert(1);
+        numbers.insert(2);
+        numbers.insert(3);
+
+        assert!(numbers.contains_element(&2))
+    }
+
+    #[test]
+    fn btreesets_are_collections() {
+        let mut numbers = std::collections::BTreeSet::new();
+        numbers.insert(1);
+        numbers.insert(2);
+        numbers.insert(3);
 
         assert!(numbers.contains_element(&2))
     }
