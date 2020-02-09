@@ -50,6 +50,12 @@ impl<T: std::cmp::PartialEq> Collection<T> for std::collections::VecDeque<T> {
     }
 }
 
+impl<T: std::cmp::PartialEq> Collection<T> for std::collections::LinkedList<T> {
+    fn contains_element(&self, element: &T) -> bool {
+        self.contains(element)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::Collection;
@@ -83,6 +89,16 @@ mod tests {
     #[test]
     fn vecdeques_are_collections() {
         let mut numbers = std::collections::VecDeque::new();
+        numbers.push_back(1);
+        numbers.push_back(2);
+        numbers.push_back(3);
+
+        assert!(numbers.contains_element(&2))
+    }
+
+    #[test]
+    fn linkedlists_are_collections() {
+        let mut numbers = std::collections::LinkedList::new();
         numbers.push_back(1);
         numbers.push_back(2);
         numbers.push_back(3);
