@@ -35,7 +35,7 @@ fn fail_test(message: String) {
 #[cfg(test)]
 mod tests {
     use crate::expect;
-    use crate::matchers::equal::equal;
+    use crate::matchers::equal;
 
     #[test]
     fn expect_to_should_not_panic_if_the_matcher_matches_successfully() {
