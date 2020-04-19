@@ -16,14 +16,14 @@ impl<E: std::fmt::Debug, A: PartialEq<E> + std::fmt::Debug> Matcher<A> for Equal
     fn failure_message(&self, actual: &A) -> String {
         format!(
             "\tExpected:\n\t\t{:?}\n\tto equal:\n\t\t{:?}",
-            self.expected, actual
+            actual, self.expected,
         )
     }
 
     fn negated_failure_message(&self, actual: &A) -> String {
         format!(
             "\tExpected:\n\t\t{:?}\n\tnot to equal:\n\t\t{:?}",
-            self.expected, actual
+            actual, self.expected
         )
     }
 }
@@ -54,7 +54,7 @@ mod tests {
     fn failure_messages() {
         assert_eq!(
             EqualMatcher { expected: "foo" }.failure_message(&"bar"),
-            String::from("\tExpected:\n\t\t\"foo\"\n\tto equal:\n\t\t\"bar\"")
+            String::from("\tExpected:\n\t\t\"bar\"\n\tto equal:\n\t\t\"foo\"")
         );
         assert_eq!(
             EqualMatcher { expected: "foo" }.negated_failure_message(&"foo"),
