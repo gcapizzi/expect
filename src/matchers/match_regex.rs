@@ -2,17 +2,19 @@ use crate::Matcher;
 
 use regex::Regex;
 
-pub fn match_regex(regex: &str) -> MatchRegexMatcher {
+pub fn match_regex<S: AsRef<str>>(regex: S) -> MatchRegexMatcher<S> {
     MatchRegexMatcher { regex }
 }
 
-pub struct MatchRegexMatcher<'a> {
-    regex: &'a str,
+pub struct MatchRegexMatcher<S> {
+    regex: S,
 }
 
-impl<'a, A: AsRef<str> + std::fmt::Debug> Matcher<A> for MatchRegexMatcher<'a> {
+impl<A: AsRef<str> + std::fmt::Debug, E: AsRef<str> + std::fmt::Debug> Matcher<A>
+    for MatchRegexMatcher<E>
+{
     fn match_value(&self, actual: &A) -> bool {
-        if let Ok(compiled_regex) = self.regex.parse::<Regex>() {
+        if let Ok(compiled_regex) = self.regex.as_ref().parse::<Regex>() {
             return compiled_regex.is_match(actual.as_ref());
         }
         return false;
