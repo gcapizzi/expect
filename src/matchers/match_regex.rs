@@ -1,0 +1,69 @@
+use crate::Matcher;
+
+use regex::Regex;
+
+pub fn match_regex(regex: &str) -> MatchRegexMatcher {
+    MatchRegexMatcher { regex }
+}
+
+pub struct MatchRegexMatcher<'a> {
+    regex: &'a str,
+}
+
+impl<'a, A: AsRef<str> + std::fmt::Debug> Matcher<A> for MatchRegexMatcher<'a> {
+    fn match_value(&self, actual: &A) -> bool {
+        if let Ok(compiled_regex) = self.regex.parse::<Regex>() {
+            return compiled_regex.is_match(actual.as_ref());
+        }
+        return false;
+    }
+
+    fn failure_message(&self, actual: &A) -> String {
+        format!(
+            "\tExpected:\n\t\t{:?}\n\tto match regex:\n\t\t{:?}",
+            actual, self.regex,
+        )
+    }
+
+    fn negated_failure_message(&self, actual: &A) -> String {
+        format!(
+            "\tExpected:\n\t\t{:?}\n\tnot to match regex:\n\t\t{:?}",
+            actual, self.regex,
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::match_regex;
+    use super::MatchRegexMatcher;
+    use crate::expect;
+    use crate::Matcher;
+
+    #[test]
+    fn should_match_if_actual_matches_with_regex() {
+        assert!(MatchRegexMatcher { regex: "foo.*" }.match_value(&"foobar"))
+    }
+
+    #[test]
+    fn should_not_match_if_actual_does_not_match_regex() {
+        assert!(!MatchRegexMatcher { regex: "foo.*" }.match_value(&"bar"))
+    }
+
+    #[test]
+    fn failure_messages() {
+        assert_eq!(
+            MatchRegexMatcher { regex: "foo.*" }.failure_message(&"bar"),
+            String::from("\tExpected:\n\t\t\"bar\"\n\tto match regex:\n\t\t\"foo.*\"")
+        );
+        assert_eq!(
+            MatchRegexMatcher { regex: "foo.*" }.negated_failure_message(&"foobar"),
+            String::from("\tExpected:\n\t\t\"foobar\"\n\tnot to match regex:\n\t\t\"foo.*\"")
+        );
+    }
+
+    #[test]
+    fn match_regex_should_construct_a_match_regex_matcher() {
+        expect(&"foobar").to(match_regex("foo.*"))
+    }
+}
