@@ -53,6 +53,10 @@ expect(&(2 + 2)).to(equal(4))
   expect(&[1, 2, 3]).to(contain(2));
   expect(&vec![1, 2, 3]).not_to(contain(4));
   ```
+* **`be_empty`**:
+  ```rust
+  expect(Vec::<i32>::new()).to(be_empty());
+  ```
 
 ### `Option` matchers
 
