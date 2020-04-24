@@ -52,7 +52,7 @@ pub trait Matcher<T> {
 /// Creates an [`Expectation`].
 ///
 /// [`Expectation`]: struct.Expectation.html
-pub fn expect<'a, T>(actual: &'a T) -> Expectation<'a, T> {
+pub fn expect<T>(actual: &T) -> Expectation<T> {
     Expectation { actual }
 }
 
