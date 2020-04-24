@@ -38,7 +38,7 @@ mod tests {
 
     #[test]
     fn should_match_if_actual_exists() {
-        assert!(exist().match_value(&"./Cargo.toml"))
+        assert!(exist().match_value(&env!("CARGO_HOME")))
     }
 
     #[test]
