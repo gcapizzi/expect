@@ -12,7 +12,7 @@ use regex::Regex;
 /// # Examples
 ///
 /// ```
-/// # use expect::{expect, matchers::regex::match_regex};
+/// # use expect::{expect, matchers::string::match_regex};
 /// expect(&"abc-123").to(match_regex(r"^[a-z]{3}-\d{3}$"));
 /// expect(&"abc-123").to(match_regex(r"\d{3}"));
 /// ```

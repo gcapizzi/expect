@@ -1,8 +1,8 @@
 pub mod collection;
 pub mod option;
 pub mod path;
-pub mod regex;
 pub mod result;
+pub mod string;
 
 use crate::Matcher;
 
