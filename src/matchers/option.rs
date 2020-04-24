@@ -1,5 +1,16 @@
 use crate::Matcher;
 
+/// Matches if `actual` is an [`Option::Some`].
+///
+/// [`Option::Some`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.Some
+///
+/// # Examples
+///
+/// ```
+/// # use expect::{expect, matchers::option::be_some};
+/// expect(&Some("foo")).to(be_some());
+/// expect(&None::<&str>).not_to(be_some());
+/// ```
 pub fn be_some() -> SomeMatcher {
     SomeMatcher {}
 }
@@ -20,6 +31,17 @@ impl<T: std::fmt::Debug> Matcher<Option<T>> for SomeMatcher {
     }
 }
 
+/// Matches if `actual` is an [`Option::None`].
+///
+/// [`Option::None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None
+///
+/// # Examples
+///
+/// ```
+/// # use expect::{expect, matchers::option::be_none};
+/// expect(&None::<&str>).to(be_none());
+/// expect(&Some("foo")).not_to(be_none());
+/// ```
 pub fn be_none() -> NoneMatcher {
     NoneMatcher {}
 }

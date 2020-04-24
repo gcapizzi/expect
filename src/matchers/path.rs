@@ -2,6 +2,15 @@ use crate::Matcher;
 
 use std::path::Path;
 
+/// Matches if the actual path points to en existing file or directory
+///
+/// # Examples
+///
+/// ```
+/// # use expect::{expect, matchers::path::exist};
+/// expect(&env!("CARGO_HOME")).to(exist());
+/// expect(&"/does/not/exist").not_to(exist());
+/// ```
 pub fn exist() -> ExistMatcher {
     ExistMatcher {}
 }

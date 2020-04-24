@@ -6,6 +6,15 @@ pub mod result;
 
 use crate::Matcher;
 
+/// Matches if `expected` is equal to the actual value.
+///
+/// # Examples
+///
+/// ```
+/// # use expect::{expect, matchers::equal};
+/// expect(&"foo").to(equal("foo"));
+/// expect(&"foo").not_to(equal("bar"));
+/// ```
 pub fn equal<T>(expected: T) -> EqualMatcher<T> {
     EqualMatcher { expected }
 }

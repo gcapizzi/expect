@@ -1,5 +1,16 @@
 use crate::Matcher;
 
+/// Matches if `actual` is a [`Result::Ok`].
+///
+/// [`Restul::Ok`]: https://doc.rust-lang.org/std/result/enum.Result.html#variant.Ok
+///
+/// # Examples
+///
+/// ```
+/// # use expect::{expect, matchers::result::be_ok};
+/// expect(&Ok::<&str, &str>("foo")).to(be_ok());
+/// expect(&Err::<&str, &str>("bar")).not_to(be_ok());
+/// ```
 pub fn be_ok() -> OkMatcher {
     OkMatcher {}
 }
@@ -20,6 +31,17 @@ impl<T: std::fmt::Debug, E: std::fmt::Debug> Matcher<Result<T, E>> for OkMatcher
     }
 }
 
+/// Matches if `actual` is a [`Result::Err`].
+///
+/// [`Restul::Ok`]: https://doc.rust-lang.org/std/result/enum.Result.html#variant.Err
+///
+/// # Examples
+///
+/// ```
+/// # use expect::{expect, matchers::result::be_err};
+/// expect(&Err::<&str, &str>("foo")).to(be_err());
+/// expect(&Ok::<&str, &str>("bar")).not_to(be_err());
+/// ```
 pub fn be_err() -> ErrMatcher {
     ErrMatcher {}
 }

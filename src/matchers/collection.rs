@@ -1,5 +1,24 @@
 use crate::Matcher;
 
+/// Matches if `actual` contains `element`.
+///
+/// Supports [arrays] of up to 256 elements, [`Vec`]s, [`VecDeque`]s, [`LinkedList`]s, [`HashSet`]s
+/// and [`BTreeSet`]s.
+///
+/// [array]: https://doc.rust-lang.org/std/primitive.array.html
+/// [`Vec`]: https://doc.rust-lang.org/std/vec/struct.Vec.html
+/// [`VecDeque`]: https://doc.rust-lang.org/std/collections/struct.VecDeque.html
+/// [`LinkedList`]: https://doc.rust-lang.org/std/collections/struct.LinkedList.html
+/// [`HashSet`]: https://doc.rust-lang.org/std/collections/struct.HashSet.html
+/// [`BTreeSet`]: https://doc.rust-lang.org/std/collections/struct.BTreeSet.html
+///
+/// Examples
+///
+/// ```
+/// # use expect::{expect, matchers::collection::contain};
+/// expect(&[1, 2, 3]).to(contain(2));
+/// expect(&vec![1, 2, 3]).not_to(contain(4));
+/// ```
 pub fn contain<T>(element: T) -> ContainMatcher<T> {
     ContainMatcher { element }
 }

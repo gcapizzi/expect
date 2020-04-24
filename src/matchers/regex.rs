@@ -2,6 +2,20 @@ use crate::Matcher;
 
 use regex::Regex;
 
+/// Matches if the provided regular expression matches the actual value.
+///
+/// `regex` needs to be a valid regular expression and the matching is performed using the
+/// [`is_match`] method.
+///
+/// [`is_match`]: https://docs.rs/regex/1.3.7/regex/struct.Regex.html#method.is_match
+///
+/// # Examples
+///
+/// ```
+/// # use expect::{expect, matchers::regex::match_regex};
+/// expect(&"abc-123").to(match_regex(r"^[a-z]{3}-\d{3}$"));
+/// expect(&"abc-123").to(match_regex(r"\d{3}"));
+/// ```
 pub fn match_regex<S: AsRef<str>>(regex: S) -> MatchRegexMatcher<S> {
     MatchRegexMatcher { regex }
 }
