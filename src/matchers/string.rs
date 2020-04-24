@@ -31,7 +31,7 @@ impl<A: AsRef<str> + std::fmt::Debug, E: AsRef<str> + std::fmt::Debug> Matcher<A
         if let Ok(compiled_regex) = self.regex.as_ref().parse::<Regex>() {
             return compiled_regex.is_match(actual.as_ref());
         }
-        return false;
+        false
     }
 
     fn failure_message(&self, actual: &A) -> String {
