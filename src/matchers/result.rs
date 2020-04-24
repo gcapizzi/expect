@@ -64,64 +64,50 @@ impl<T: std::fmt::Debug, E: std::fmt::Debug> Matcher<Result<T, E>> for ErrMatche
 
 #[cfg(test)]
 mod tests {
-    use super::be_err;
-    use super::be_ok;
-    use super::ErrMatcher;
-    use super::OkMatcher;
-    use crate::expect;
+    use super::{be_err, be_ok};
     use crate::Matcher;
 
     #[test]
     fn ok_matcher_should_match_if_actual_is_ok() {
-        assert!(OkMatcher {}.match_value(&Ok::<u32, &str>(42)))
+        assert!(be_ok().match_value(&Ok::<u32, &str>(42)))
     }
 
     #[test]
     fn ok_matcher_should_not_match_if_actual_is_err() {
-        assert!(!OkMatcher {}.match_value(&Err::<u32, &str>("boo")))
+        assert!(!be_ok().match_value(&Err::<u32, &str>("boo")))
     }
 
     #[test]
     fn ok_matcher_failure_messages() {
         assert_eq!(
-            OkMatcher {}.failure_message(&Err::<u32, &str>("boo")),
+            be_ok().failure_message(&Err::<u32, &str>("boo")),
             String::from("\tExpected:\n\t\tErr(\"boo\")\n\tto be Ok")
         );
         assert_eq!(
-            OkMatcher {}.negated_failure_message(&Ok::<u32, &str>(42)),
+            be_ok().negated_failure_message(&Ok::<u32, &str>(42)),
             String::from("\tExpected:\n\t\tOk(42)\n\tnot to be Ok")
         );
     }
 
     #[test]
-    fn be_ok_should_contruct_an_ok_matcher() {
-        expect(&Ok::<u32, &str>(42)).to(be_ok())
-    }
-
-    #[test]
     fn err_matcher_should_match_if_actual_is_an_err() {
-        assert!(ErrMatcher {}.match_value(&Err::<u32, &str>("boo")))
+        assert!(be_err().match_value(&Err::<u32, &str>("boo")))
     }
 
     #[test]
     fn err_matcher_should_not_match_if_actual_is_ok() {
-        assert!(!ErrMatcher {}.match_value(&Ok::<u32, &str>(42)))
+        assert!(!be_err().match_value(&Ok::<u32, &str>(42)))
     }
 
     #[test]
     fn err_matcher_failure_messages() {
         assert_eq!(
-            ErrMatcher {}.failure_message(&Ok::<u32, &str>(42)),
+            be_err().failure_message(&Ok::<u32, &str>(42)),
             String::from("\tExpected:\n\t\tOk(42)\n\tto be an Err")
         );
         assert_eq!(
-            ErrMatcher {}.negated_failure_message(&Err::<u32, &str>("boo")),
+            be_err().negated_failure_message(&Err::<u32, &str>("boo")),
             String::from("\tExpected:\n\t\tErr(\"boo\")\n\tnot to be an Err")
         );
-    }
-
-    #[test]
-    fn be_err_should_contruct_an_err_matcher() {
-        expect(&Err::<u32, &str>("boo")).to(be_err())
     }
 }

@@ -64,64 +64,50 @@ impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<Option<T>> for NoneMatche
 
 #[cfg(test)]
 mod tests {
-    use super::be_none;
-    use super::be_some;
-    use super::NoneMatcher;
-    use super::SomeMatcher;
-    use crate::expect;
+    use super::{be_none, be_some};
     use crate::Matcher;
 
     #[test]
     fn some_matcher_should_match_if_actual_is_some() {
-        assert!(SomeMatcher {}.match_value(&Some("foo")))
+        assert!(be_some().match_value(&Some("foo")))
     }
 
     #[test]
     fn some_matcher_should_not_match_if_actual_is_none() {
-        assert!(!SomeMatcher {}.match_value(&None::<u32>))
+        assert!(!be_some().match_value(&None::<u32>))
     }
 
     #[test]
     fn some_matcher_failure_messages() {
         assert_eq!(
-            SomeMatcher {}.failure_message(&None::<&str>),
+            be_some().failure_message(&None::<&str>),
             String::from("\tExpected:\n\t\tNone\n\tto be a Some")
         );
         assert_eq!(
-            SomeMatcher {}.negated_failure_message(&Some("foo")),
+            be_some().negated_failure_message(&Some("foo")),
             String::from("\tExpected:\n\t\tSome(\"foo\")\n\tnot to be a Some")
         );
     }
 
     #[test]
-    fn be_some_should_contruct_a_some_matcher() {
-        expect(&Some("thing")).to(be_some())
-    }
-
-    #[test]
     fn none_matcher_should_match_if_actual_is_none() {
-        assert!(NoneMatcher {}.match_value(&None::<&str>))
+        assert!(be_none().match_value(&None::<&str>))
     }
 
     #[test]
     fn none_matcher_should_not_match_if_actual_is_some() {
-        assert!(!NoneMatcher {}.match_value(&Some("thing")))
+        assert!(!be_none().match_value(&Some("thing")))
     }
 
     #[test]
     fn none_matcher_failure_messages() {
         assert_eq!(
-            NoneMatcher {}.failure_message(&Some("foo")),
+            be_none().failure_message(&Some("foo")),
             String::from("\tExpected:\n\t\tSome(\"foo\")\n\tto be None")
         );
         assert_eq!(
-            NoneMatcher {}.negated_failure_message(&None::<&str>),
+            be_none().negated_failure_message(&None::<&str>),
             String::from("\tExpected:\n\t\tNone\n\tnot to be None")
         );
-    }
-
-    #[test]
-    fn be_none_should_contruct_a_none_matcher() {
-        expect(&None::<&str>).to(be_none())
     }
 }

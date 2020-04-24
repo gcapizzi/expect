@@ -183,74 +183,51 @@ impl<T: std::cmp::Ord> Collection<T> for std::collections::BTreeSet<T> {
 
 #[cfg(test)]
 mod tests {
-    use super::{be_empty, contain, BeEmptyMatcher, Collection, ContainMatcher};
-    use crate::{expect, Matcher};
-    use std::marker::PhantomData;
+    use super::{be_empty, contain, Collection};
+    use crate::Matcher;
 
     #[test]
     fn contain_matcher_should_match_if_collection_contains_element() {
-        assert!(ContainMatcher { element: "foo" }.match_value(&vec!["foo"]))
+        assert!(contain("foo").match_value(&vec!["foo"]))
     }
 
     #[test]
     fn contain_matcher_should_not_match_if_collection_does_not_contain_element() {
-        assert!(!ContainMatcher { element: "foo" }.match_value(&vec!["bar"]))
+        assert!(!contain("foo").match_value(&vec!["bar"]))
     }
 
     #[test]
     fn contain_matcher_failure_messages() {
         assert_eq!(
-            ContainMatcher { element: "foo" }.failure_message(&vec!["bar"]),
+            contain("foo").failure_message(&vec!["bar"]),
             String::from("\tExpected:\n\t\t[\"bar\"]\n\tto contain:\n\t\t\"foo\"")
         );
         assert_eq!(
-            ContainMatcher { element: "foo" }.negated_failure_message(&vec!["foo"]),
+            contain("foo").negated_failure_message(&vec!["foo"]),
             String::from("\tExpected:\n\t\t[\"foo\"]\n\tnot to contain:\n\t\t\"foo\"")
         );
     }
 
     #[test]
-    fn contain_should_construct_a_contain_matcher() {
-        expect(&vec!["foo", "bar"]).to(contain("foo"))
-    }
-
-    #[test]
     fn be_empty_matcher_should_match_if_collection_is_empty() {
-        assert!(BeEmptyMatcher {
-            phantom: PhantomData
-        }
-        .match_value(&std::vec::Vec::<i32>::new()))
+        assert!(be_empty().match_value(&std::vec::Vec::<i32>::new()))
     }
 
     #[test]
     fn be_empty_matcher_should_not_match_if_collection_is_not_empty() {
-        assert!(!BeEmptyMatcher {
-            phantom: PhantomData
-        }
-        .match_value(&vec![42]))
+        assert!(!be_empty().match_value(&vec![42]))
     }
 
     #[test]
     fn be_empty_matcher_failure_messages() {
         assert_eq!(
-            BeEmptyMatcher {
-                phantom: PhantomData
-            }
-            .failure_message(&vec!["bar"]),
+            be_empty().failure_message(&vec!["bar"]),
             String::from("\tExpected:\n\t\t[\"bar\"]\n\tto be empty")
         );
         assert_eq!(
-            BeEmptyMatcher {
-                phantom: PhantomData
-            }
-            .negated_failure_message(&std::vec::Vec::<i32>::new()),
+            be_empty().negated_failure_message(&std::vec::Vec::<i32>::new()),
             String::from("\tExpected:\n\t\t[]\n\tnot to be empty")
         );
-    }
-
-    #[test]
-    fn be_empty_should_construct_a_be_empty_matcher() {
-        expect(&std::vec::Vec::<i32>::new()).to(be_empty())
     }
 
     #[test]

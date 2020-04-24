@@ -52,34 +52,27 @@ impl<A: AsRef<str> + std::fmt::Debug, E: AsRef<str> + std::fmt::Debug> Matcher<A
 #[cfg(test)]
 mod tests {
     use super::match_regex;
-    use super::MatchRegexMatcher;
-    use crate::expect;
     use crate::Matcher;
 
     #[test]
     fn should_match_if_actual_matches_with_regex() {
-        assert!(MatchRegexMatcher { regex: "foo.*" }.match_value(&"foobar"))
+        assert!(match_regex("foo.*").match_value(&"foobar"))
     }
 
     #[test]
     fn should_not_match_if_actual_does_not_match_regex() {
-        assert!(!MatchRegexMatcher { regex: "foo.*" }.match_value(&"bar"))
+        assert!(!match_regex("foo.*").match_value(&"bar"))
     }
 
     #[test]
     fn failure_messages() {
         assert_eq!(
-            MatchRegexMatcher { regex: "foo.*" }.failure_message(&"bar"),
+            match_regex("foo.*").failure_message(&"bar"),
             String::from("\tExpected:\n\t\t\"bar\"\n\tto match regex:\n\t\t\"foo.*\"")
         );
         assert_eq!(
-            MatchRegexMatcher { regex: "foo.*" }.negated_failure_message(&"foobar"),
+            match_regex("foo.*").negated_failure_message(&"foobar"),
             String::from("\tExpected:\n\t\t\"foobar\"\n\tnot to match regex:\n\t\t\"foo.*\"")
         );
-    }
-
-    #[test]
-    fn match_regex_should_construct_a_match_regex_matcher() {
-        expect(&"foobar").to(match_regex("foo.*"))
     }
 }
