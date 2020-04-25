@@ -55,7 +55,7 @@ expect(&(2 + 2)).to(equal(4))
   ```
 * **`be_empty`**:
   ```rust
-  expect(Vec::<i32>::new()).to(be_empty());
+  expect(&Vec::<i32>::new()).to(be_empty());
   ```
 
 ### `Option` matchers
