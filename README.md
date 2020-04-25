@@ -3,7 +3,7 @@
 An assertions/expectations library for Rust. `expect` provides a syntax
 inspired by [RSpec](https://rspec.info/documentation/3.9/rspec-expectations/)
 and [Gomega](https://onsi.github.io/gomega/), and a set of powerful built-in
-matchers. 
+matchers.
 
 ## Getting `expect`
 
