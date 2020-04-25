@@ -30,6 +30,51 @@ impl<T> Matcher<Option<T>> for SomeMatcher {
     }
 }
 
+/// Matches if `actual` is an [`Option::Some`] *and* the contained value matches the inner matcher.
+///
+/// [`Option::Some`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.Some
+///
+/// # Examples
+///
+/// ```
+/// # use expect::{expect, matchers::{equal, collection::contain, option::match_some,
+/// string::match_regex}};
+/// expect(&Some(vec![1, 2, 3])).to(match_some(contain(2)));
+/// expect(&Some("foo")).not_to(match_some(match_regex("\\d+")));
+/// expect(&None::<&str>).not_to(match_some(equal("foo")));
+/// ```
+pub fn match_some<I>(inner: I) -> MatchSomeMatcher<I> {
+    MatchSomeMatcher { inner }
+}
+
+pub struct MatchSomeMatcher<I> {
+    inner: I,
+}
+
+impl<T: std::fmt::Debug, M: Matcher<T>> Matcher<Option<T>> for MatchSomeMatcher<M> {
+    fn match_value(&self, actual: &Option<T>) -> bool {
+        if let Some(value) = actual {
+            return self.inner.match_value(value);
+        }
+        false
+    }
+
+    fn description(&self, actual: &Option<T>) -> Description {
+        if let Some(value) = actual {
+            let inner_desc = self.inner.description(value);
+            Description {
+                verb: format!("be a Some and {}", inner_desc.verb),
+                object: inner_desc.object,
+            }
+        } else {
+            Description {
+                verb: String::from("be a Some"),
+                object: None,
+            }
+        }
+    }
+}
+
 /// Matches if `actual` is an [`Option::None`].
 ///
 /// [`Option::None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None
@@ -62,8 +107,8 @@ impl<T> Matcher<Option<T>> for NoneMatcher {
 
 #[cfg(test)]
 mod tests {
-    use super::{be_none, be_some};
-    use crate::Matcher;
+    use super::{be_none, be_some, match_some};
+    use crate::{matchers::equal, Matcher};
 
     #[test]
     fn some_matcher_should_match_if_actual_is_some() {
@@ -97,5 +142,35 @@ mod tests {
         let description = be_none().description(&None::<&str>);
         assert_eq!(description.verb, String::from("be None"));
         assert_eq!(description.object, None);
+    }
+
+    #[test]
+    fn match_some_matcher_should_match_if_actual_is_some_and_inner_value_matches_inner_matcher() {
+        assert!(match_some(equal("foo")).match_value(&Some("foo")))
+    }
+
+    #[test]
+    fn match_some_matcher_should_not_match_if_actual_is_some_but_inner_value_does_not_match_inner_matcher(
+    ) {
+        assert!(!match_some(equal("foo")).match_value(&Some("bar")))
+    }
+
+    #[test]
+    fn match_some_matcher_should_not_match_if_actual_is_not_some() {
+        assert!(!match_some(equal("foo")).match_value(&None::<&str>))
+    }
+
+    #[test]
+    fn match_some_matcher_should_describe_itself_when_actual_is_not_some() {
+        let description = match_some(equal("foo")).description(&None::<&str>);
+        assert_eq!(description.verb, String::from("be a Some"));
+        assert_eq!(description.object, None)
+    }
+
+    #[test]
+    fn match_some_matcher_should_describe_itself_and_its_inner_matcher_when_actual_is_some() {
+        let description = match_some(equal("foo")).description(&Some("foo"));
+        assert_eq!(description.verb, String::from("be a Some and equal"));
+        assert_eq!(description.object, Some(String::from("\"foo\"")))
     }
 }
