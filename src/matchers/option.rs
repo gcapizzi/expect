@@ -48,7 +48,7 @@ pub fn be_none() -> NoneMatcher {
 
 pub struct NoneMatcher {}
 
-impl<T: std::cmp::PartialEq + std::fmt::Debug> Matcher<Option<T>> for NoneMatcher {
+impl<T: std::fmt::Debug> Matcher<Option<T>> for NoneMatcher {
     fn match_value(&self, actual: &Option<T>) -> bool {
         actual.is_none()
     }
