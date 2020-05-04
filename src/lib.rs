@@ -21,32 +21,29 @@
 //! [`Matcher`]: trait.Matcher.html
 pub mod matchers;
 
+pub struct Description {
+    pub verb: String,
+    pub object: Option<String>,
+}
+
 /// The contract implemented by matchers.
 pub trait Matcher<T> {
     /// Should return `true` if `actual` is a match.
     fn match_value(&self, actual: &T) -> bool;
 
-    /// Should return an appropriate message for a failure to match `actual`, i.e. a failure caused
-    /// by `match_value` returning `false`.
+    /// Should return a [`Description`] of the matcher, to be used for reporting. `actual` _should
+    /// not_ be necessary here, but is still passed for type-checking reasons.
+    ///
+    /// [`Expectation`]: struct.Description.html
     ///
     /// # Example
     ///
     /// ```
-    /// # use expect::{Matcher, matchers::equal};
-    /// assert_eq!(equal(2).failure_message(&3), String::from("\tExpected:\n\t\t3\n\tto equal:\n\t\t2"));
+    /// # use expect::{Description, Matcher, matchers::EqualMatcher, matchers::equal};
+    /// assert_eq!(equal(2).description(&2).verb, String::from("equal"));
+    /// assert_eq!(equal(2).description(&2).object, Some(String::from("2")));
     /// ```
-    fn failure_message(&self, actual: &T) -> String;
-
-    /// Should return an appropriate message for a failure *not* to match `actual`, i.e. a failure
-    /// caused by `match_value` returning `true`.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use expect::{Matcher, matchers::equal};
-    /// assert_eq!(equal(2).negated_failure_message(&2), String::from("\tExpected:\n\t\t2\n\tnot to equal:\n\t\t2"));
-    /// ```
-    fn negated_failure_message(&self, actual: &T) -> String;
+    fn description(&self, actual: &T) -> Description;
 }
 
 /// Creates an [`Expectation`].
@@ -63,42 +60,61 @@ pub struct Expectation<'a, T> {
     actual: &'a T,
 }
 
-impl<'a, T> Expectation<'a, T> {
+impl<'a, T: std::fmt::Debug> Expectation<'a, T> {
     /// Checks the actual value agains a [`Matcher`], looking for a match.
     ///
-    /// If [`Matcher::match_value`] returns `false`, this method will [`panic!`] using the failure
-    /// message returned by [`Matcher::failure_message`].
+    /// If [`Matcher::match_value`] returns `false`, this method will [`panic!`] with a failure
+    /// message based on the [`Matcher::description`].
     ///
     /// [`Matcher`]: trait.Matcher.html
     /// [`Matcher::match_value`]: trait.Matcher.html#tymethod.match_value
-    /// [`Matcher::failure_message`]: trait.Matcher.html#tymethod.failure_message
-    /// [`Matcher::negated_failure_message`]: trait.Matcher.html#tymethod.negated_failure_message
+    /// [`Matcher::description`]: trait.Matcher.html#tymethod.description
     /// [`panic!`]: https://doc.rust-lang.org/std/macro.panic.html
     pub fn to<M: Matcher<T>>(&self, matcher: M) {
         if !matcher.match_value(&self.actual) {
-            fail_test(matcher.failure_message(&self.actual))
+            fail_test(&self.actual, matcher.description(&self.actual))
         }
     }
 
     /// Checks the actual value agains a [`Matcher`], looking for the lack of a match.
     ///
-    /// If [`Matcher::match_value`] returns `true`, this method will [`panic!`] using the failure
-    /// message returned by [`Matcher::negated_failure_message`].
+    /// If [`Matcher::match_value`] returns `true`, this method will [`panic!`] with a failure
+    /// message based on the [`Matcher::description`].
     ///
     /// [`Matcher`]: trait.Matcher.html
     /// [`Matcher::match_value`]: trait.Matcher.html#tymethod.match_value
-    /// [`Matcher::failure_message`]: trait.Matcher.html#tymethod.failure_message
-    /// [`Matcher::negated_failure_message`]: trait.Matcher.html#tymethod.negated_failure_message
+    /// [`Matcher::description`]: trait.Matcher.html#tymethod.description
     /// [`panic!`]: https://doc.rust-lang.org/std/macro.panic.html
     pub fn not_to<M: Matcher<T>>(&self, matcher: M) {
         if matcher.match_value(&self.actual) {
-            fail_test(matcher.negated_failure_message(&self.actual))
+            fail_test_negated(&self.actual, matcher.description(&self.actual))
         }
     }
 }
 
-fn fail_test(message: String) {
-    panic!("Expectation failed:\n{}\n", message)
+fn fail_test<T: std::fmt::Debug>(actual: T, description: Description) {
+    panic!(failure_message(actual, description, "to"))
+}
+
+fn fail_test_negated<T: std::fmt::Debug>(actual: T, description: Description) {
+    panic!(failure_message(actual, description, "not to"))
+}
+
+fn failure_message<T: std::fmt::Debug>(
+    actual: T,
+    description: Description,
+    before_verb: &str,
+) -> String {
+    let predicate = if let Some(obj) = description.object {
+        format!("{}:\n\t\t{}", description.verb, obj)
+    } else {
+        description.verb
+    };
+
+    format!(
+        "Expectation failed:\n\tExpected:\n\t\t{:?}\n\t{} {}\n",
+        actual, before_verb, predicate
+    )
 }
 
 #[cfg(test)]

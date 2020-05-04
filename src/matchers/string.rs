@@ -1,4 +1,4 @@
-use crate::Matcher;
+use crate::{Description, Matcher};
 
 use regex::Regex;
 
@@ -24,9 +24,7 @@ pub struct MatchRegexMatcher<S> {
     regex: S,
 }
 
-impl<A: AsRef<str> + std::fmt::Debug, E: AsRef<str> + std::fmt::Debug> Matcher<A>
-    for MatchRegexMatcher<E>
-{
+impl<A: AsRef<str>, E: AsRef<str> + std::fmt::Debug> Matcher<A> for MatchRegexMatcher<E> {
     fn match_value(&self, actual: &A) -> bool {
         if let Ok(compiled_regex) = self.regex.as_ref().parse::<Regex>() {
             return compiled_regex.is_match(actual.as_ref());
@@ -34,18 +32,11 @@ impl<A: AsRef<str> + std::fmt::Debug, E: AsRef<str> + std::fmt::Debug> Matcher<A
         false
     }
 
-    fn failure_message(&self, actual: &A) -> String {
-        format!(
-            "\tExpected:\n\t\t{:?}\n\tto match regex:\n\t\t{:?}",
-            actual, self.regex,
-        )
-    }
-
-    fn negated_failure_message(&self, actual: &A) -> String {
-        format!(
-            "\tExpected:\n\t\t{:?}\n\tnot to match regex:\n\t\t{:?}",
-            actual, self.regex,
-        )
+    fn description(&self, _: &A) -> Description {
+        Description {
+            verb: String::from("match regex"),
+            object: Some(format!("{:?}", self.regex)),
+        }
     }
 }
 
@@ -65,14 +56,9 @@ mod tests {
     }
 
     #[test]
-    fn failure_messages() {
-        assert_eq!(
-            match_regex("foo.*").failure_message(&"bar"),
-            String::from("\tExpected:\n\t\t\"bar\"\n\tto match regex:\n\t\t\"foo.*\"")
-        );
-        assert_eq!(
-            match_regex("foo.*").negated_failure_message(&"foobar"),
-            String::from("\tExpected:\n\t\t\"foobar\"\n\tnot to match regex:\n\t\t\"foo.*\"")
-        );
+    fn should_describe_itself() {
+        let description = match_regex("foo").description(&"bar");
+        assert_eq!(description.verb, String::from("match regex"));
+        assert_eq!(description.object, Some(String::from("\"foo\"")));
     }
 }

@@ -1,4 +1,4 @@
-use crate::Matcher;
+use crate::{Description, Matcher};
 
 use std::path::Path;
 
@@ -17,17 +17,16 @@ pub fn exist() -> ExistMatcher {
 
 pub struct ExistMatcher {}
 
-impl<T: std::fmt::Debug + AsRef<Path>> Matcher<T> for ExistMatcher {
+impl<T: AsRef<Path>> Matcher<T> for ExistMatcher {
     fn match_value(&self, actual: &T) -> bool {
         actual.as_ref().exists()
     }
 
-    fn failure_message(&self, actual: &T) -> String {
-        format!("\tExpected:\n\t\t{:?}\n\tto exist", actual)
-    }
-
-    fn negated_failure_message(&self, actual: &T) -> String {
-        format!("\tExpected:\n\t\t{:?}\n\tnot to exist", actual)
+    fn description(&self, _: &T) -> Description {
+        Description {
+            verb: String::from("exist"),
+            object: None,
+        }
     }
 }
 
@@ -47,14 +46,9 @@ mod tests {
     }
 
     #[test]
-    fn failure_messages() {
-        assert_eq!(
-            exist().failure_message(&"does_not_exist"),
-            String::from("\tExpected:\n\t\t\"does_not_exist\"\n\tto exist")
-        );
-        assert_eq!(
-            exist().negated_failure_message(&"does_exist"),
-            String::from("\tExpected:\n\t\t\"does_exist\"\n\tnot to exist")
-        );
+    fn should_describe_itself() {
+        let description = exist().description(&"bar");
+        assert_eq!(description.verb, String::from("exist"));
+        assert_eq!(description.object, None);
     }
 }

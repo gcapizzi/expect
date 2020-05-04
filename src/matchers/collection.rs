@@ -1,4 +1,4 @@
-use crate::Matcher;
+use crate::{Description, Matcher};
 
 use std::marker::PhantomData;
 
@@ -29,23 +29,16 @@ pub struct ContainMatcher<T> {
     element: T,
 }
 
-impl<T: std::fmt::Debug, V: Collection<T> + std::fmt::Debug> Matcher<V> for ContainMatcher<T> {
+impl<T: std::fmt::Debug, V: Collection<T>> Matcher<V> for ContainMatcher<T> {
     fn match_value(&self, collection: &V) -> bool {
         collection.contains_element(&self.element)
     }
 
-    fn failure_message(&self, collection: &V) -> String {
-        format!(
-            "\tExpected:\n\t\t{:?}\n\tto contain:\n\t\t{:?}",
-            collection, self.element
-        )
-    }
-
-    fn negated_failure_message(&self, collection: &V) -> String {
-        format!(
-            "\tExpected:\n\t\t{:?}\n\tnot to contain:\n\t\t{:?}",
-            collection, self.element
-        )
+    fn description(&self, _: &V) -> Description {
+        Description {
+            verb: String::from("contain"),
+            object: Some(format!("{:?}", self.element)),
+        }
     }
 }
 
@@ -77,17 +70,16 @@ pub struct BeEmptyMatcher<T> {
     phantom: PhantomData<T>,
 }
 
-impl<T, V: Collection<T> + std::fmt::Debug> Matcher<V> for BeEmptyMatcher<T> {
+impl<T, V: Collection<T>> Matcher<V> for BeEmptyMatcher<T> {
     fn match_value(&self, collection: &V) -> bool {
         collection.empty()
     }
 
-    fn failure_message(&self, collection: &V) -> String {
-        format!("\tExpected:\n\t\t{:?}\n\tto be empty", collection)
-    }
-
-    fn negated_failure_message(&self, collection: &V) -> String {
-        format!("\tExpected:\n\t\t{:?}\n\tnot to be empty", collection)
+    fn description(&self, _: &V) -> Description {
+        Description {
+            verb: String::from("be empty"),
+            object: None,
+        }
     }
 }
 
@@ -195,15 +187,10 @@ mod tests {
     }
 
     #[test]
-    fn contain_matcher_failure_messages() {
-        assert_eq!(
-            contain("foo").failure_message(&vec!["bar"]),
-            String::from("\tExpected:\n\t\t[\"bar\"]\n\tto contain:\n\t\t\"foo\"")
-        );
-        assert_eq!(
-            contain("foo").negated_failure_message(&vec!["foo"]),
-            String::from("\tExpected:\n\t\t[\"foo\"]\n\tnot to contain:\n\t\t\"foo\"")
-        );
+    fn contain_matcher_should_describe_itself() {
+        let description = contain("foo").description(&vec!["bar"]);
+        assert_eq!(description.verb, String::from("contain"));
+        assert_eq!(description.object, Some(String::from("\"foo\"")));
     }
 
     #[test]
@@ -217,15 +204,10 @@ mod tests {
     }
 
     #[test]
-    fn be_empty_matcher_failure_messages() {
-        assert_eq!(
-            be_empty().failure_message(&vec!["bar"]),
-            String::from("\tExpected:\n\t\t[\"bar\"]\n\tto be empty")
-        );
-        assert_eq!(
-            be_empty().negated_failure_message(&std::vec::Vec::<i32>::new()),
-            String::from("\tExpected:\n\t\t[]\n\tnot to be empty")
-        );
+    fn be_empty_matcher_should_describe_itself() {
+        let description = be_empty().description(&vec!["foo"]);
+        assert_eq!(description.verb, String::from("be empty"));
+        assert_eq!(description.object, None);
     }
 
     #[test]

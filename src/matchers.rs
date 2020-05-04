@@ -4,7 +4,7 @@ pub mod path;
 pub mod result;
 pub mod string;
 
-use crate::Matcher;
+use crate::{Description, Matcher};
 
 /// Matches if `expected` is equal to the actual value.
 ///
@@ -23,23 +23,16 @@ pub struct EqualMatcher<T> {
     expected: T,
 }
 
-impl<E: std::fmt::Debug, A: PartialEq<E> + std::fmt::Debug> Matcher<A> for EqualMatcher<E> {
+impl<E: std::fmt::Debug, A: PartialEq<E>> Matcher<A> for EqualMatcher<E> {
     fn match_value(&self, actual: &A) -> bool {
         actual == &self.expected
     }
 
-    fn failure_message(&self, actual: &A) -> String {
-        format!(
-            "\tExpected:\n\t\t{:?}\n\tto equal:\n\t\t{:?}",
-            actual, self.expected,
-        )
-    }
-
-    fn negated_failure_message(&self, actual: &A) -> String {
-        format!(
-            "\tExpected:\n\t\t{:?}\n\tnot to equal:\n\t\t{:?}",
-            actual, self.expected
-        )
+    fn description(&self, _actual: &A) -> Description {
+        Description {
+            verb: String::from("equal"),
+            object: Some(format!("{:?}", self.expected)),
+        }
     }
 }
 
@@ -64,14 +57,9 @@ mod tests {
     }
 
     #[test]
-    fn failure_messages() {
-        assert_eq!(
-            equal("foo").failure_message(&"bar"),
-            String::from("\tExpected:\n\t\t\"bar\"\n\tto equal:\n\t\t\"foo\"")
-        );
-        assert_eq!(
-            equal("foo").negated_failure_message(&"foo"),
-            String::from("\tExpected:\n\t\t\"foo\"\n\tnot to equal:\n\t\t\"foo\"")
-        );
+    fn should_describe_itself() {
+        let description = equal("foo").description(&"bar");
+        assert_eq!(description.verb, String::from("equal"));
+        assert_eq!(description.object, Some(String::from("\"foo\"")));
     }
 }

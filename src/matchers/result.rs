@@ -1,4 +1,4 @@
-use crate::Matcher;
+use crate::{Description, Matcher};
 
 /// Matches if `actual` is a [`Result::Ok`].
 ///
@@ -17,17 +17,16 @@ pub fn be_ok() -> OkMatcher {
 
 pub struct OkMatcher {}
 
-impl<T: std::fmt::Debug, E: std::fmt::Debug> Matcher<Result<T, E>> for OkMatcher {
+impl<T, E> Matcher<Result<T, E>> for OkMatcher {
     fn match_value(&self, actual: &Result<T, E>) -> bool {
         actual.is_ok()
     }
 
-    fn failure_message(&self, actual: &Result<T, E>) -> String {
-        format!("\tExpected:\n\t\t{:?}\n\tto be Ok", actual)
-    }
-
-    fn negated_failure_message(&self, actual: &Result<T, E>) -> String {
-        format!("\tExpected:\n\t\t{:?}\n\tnot to be Ok", actual)
+    fn description(&self, _: &Result<T, E>) -> Description {
+        Description {
+            verb: String::from("be Ok"),
+            object: None,
+        }
     }
 }
 
@@ -48,17 +47,16 @@ pub fn be_err() -> ErrMatcher {
 
 pub struct ErrMatcher {}
 
-impl<T: std::fmt::Debug, E: std::fmt::Debug> Matcher<Result<T, E>> for ErrMatcher {
+impl<T, E> Matcher<Result<T, E>> for ErrMatcher {
     fn match_value(&self, actual: &Result<T, E>) -> bool {
         actual.is_err()
     }
 
-    fn failure_message(&self, actual: &Result<T, E>) -> String {
-        format!("\tExpected:\n\t\t{:?}\n\tto be an Err", actual)
-    }
-
-    fn negated_failure_message(&self, actual: &Result<T, E>) -> String {
-        format!("\tExpected:\n\t\t{:?}\n\tnot to be an Err", actual)
+    fn description(&self, _: &Result<T, E>) -> Description {
+        Description {
+            verb: String::from("be an Err"),
+            object: None,
+        }
     }
 }
 
@@ -78,15 +76,10 @@ mod tests {
     }
 
     #[test]
-    fn ok_matcher_failure_messages() {
-        assert_eq!(
-            be_ok().failure_message(&Err::<u32, &str>("boo")),
-            String::from("\tExpected:\n\t\tErr(\"boo\")\n\tto be Ok")
-        );
-        assert_eq!(
-            be_ok().negated_failure_message(&Ok::<u32, &str>(42)),
-            String::from("\tExpected:\n\t\tOk(42)\n\tnot to be Ok")
-        );
+    fn ok_matcher_should_describe_itself() {
+        let description = be_ok().description(&Ok::<u32, &str>(42));
+        assert_eq!(description.verb, String::from("be Ok"));
+        assert_eq!(description.object, None);
     }
 
     #[test]
@@ -100,14 +93,9 @@ mod tests {
     }
 
     #[test]
-    fn err_matcher_failure_messages() {
-        assert_eq!(
-            be_err().failure_message(&Ok::<u32, &str>(42)),
-            String::from("\tExpected:\n\t\tOk(42)\n\tto be an Err")
-        );
-        assert_eq!(
-            be_err().negated_failure_message(&Err::<u32, &str>("boo")),
-            String::from("\tExpected:\n\t\tErr(\"boo\")\n\tnot to be an Err")
-        );
+    fn err_matcher_should_describe_itself() {
+        let description = be_err().description(&Err::<u32, &str>("foo"));
+        assert_eq!(description.verb, String::from("be an Err"));
+        assert_eq!(description.object, None);
     }
 }
