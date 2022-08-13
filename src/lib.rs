@@ -93,11 +93,11 @@ impl<'a, T: std::fmt::Debug> Expectation<'a, T> {
 }
 
 fn fail_test<T: std::fmt::Debug>(actual: T, description: Description) {
-    panic!(failure_message(actual, description, "to"))
+    panic!("{}", failure_message(actual, description, "to"))
 }
 
 fn fail_test_negated<T: std::fmt::Debug>(actual: T, description: Description) {
-    panic!(failure_message(actual, description, "not to"))
+    panic!("{}", failure_message(actual, description, "not to"))
 }
 
 fn failure_message<T: std::fmt::Debug>(
