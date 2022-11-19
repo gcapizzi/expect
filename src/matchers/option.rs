@@ -1,4 +1,7 @@
-use crate::{Description, Matcher};
+use crate::{
+    matchers::{equal, EqualMatcher},
+    Description, Matcher,
+};
 
 /// Matches if `actual` is an [`Option::Some`].
 ///
@@ -103,6 +106,22 @@ impl<T> Matcher<Option<T>> for NoneMatcher {
             object: None,
         }
     }
+}
+
+/// Matches if `actual` is an [`Option::Some`] *and* the contained value is equal to the actual
+/// value. `equal_some(x)` is effectively equivalent to `match_some(equal(x))`.
+///
+/// [`Option::Some`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.Some
+///
+/// # Examples
+///
+/// ```
+/// # use expect::{expect, matchers::option::equal_some};
+/// expect(&Some("foo".to_string())).to(equal_some("foo"));
+/// expect(&None::<&str>).not_to(equal_some("foo"));
+/// ```
+pub fn equal_some<I>(inner: I) -> MatchSomeMatcher<EqualMatcher<I>> {
+    match_some(equal(inner))
 }
 
 #[cfg(test)]
